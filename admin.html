@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Chalé Veraneio · Datas</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--noite:#14201a;--pinho:#1e3a2b;--lanterna:#e8a85a;--areia:#f3ecdf;--areia2:#e9dfcc;--ink:#1d1a15;--ink2:#5f5a50;--ruim:#b9573a;--branco:#fdfaf4;--linha:#d9cfbd}
+*{box-sizing:border-box}body{margin:0;background:var(--areia);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 16px 80px}
+h1{font:400 34px/1.05 "Instrument Serif",Georgia,serif;margin:0}h1 small{display:block;font:500 12px Figtree;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);margin-top:6px}
+.topo{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--linha);margin-bottom:18px}
+.btn{border:0;border-radius:999px;padding:12px 20px;font:600 13px Figtree;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:var(--noite);color:var(--areia)}
+.btn.l{background:var(--lanterna);color:#2a1a08}.btn.o{background:transparent;border:1px solid var(--ink);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:wait}
+input{font:inherit;padding:11px 13px;border:1px solid var(--linha);border-radius:10px;background:var(--branco);color:var(--ink)}
+.login{max-width:380px;margin:12vh auto;text-align:center;display:grid;gap:12px}
+.aviso{border-radius:12px;padding:10px 14px;font-size:14px;background:rgba(255,255,255,.5);border:1px solid var(--linha)}
+.aviso.ok{border-color:#4ec98b;background:rgba(78,201,139,.12)}.aviso.mal{border-color:var(--ruim);background:rgba(185,87,58,.1)}
+.legenda{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:10px 0 16px}.legenda i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--linha);background:var(--branco)}.legenda i.b{background:var(--noite);border-color:var(--noite)}.legenda i.p{background:var(--areia2);color:var(--ink2)}
+.meses{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.mes{background:var(--branco);border:1px solid var(--linha);border-radius:16px;padding:14px}
+.mes h3{margin:0 0 8px;font:400 20px "Instrument Serif",serif;text-transform:capitalize}
+.grade{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.grade b{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);text-align:center;padding:4px 0;font-weight:600}
+.dia{aspect-ratio:1;border-radius:8px;border:1px solid var(--linha);background:var(--branco);display:grid;place-items:center;font-size:13px;cursor:pointer;user-select:none;transition:transform .08s}
+.dia:hover{transform:scale(1.06)}.dia.vazio{border:0;background:transparent;cursor:default}.dia.passado{background:var(--areia2);color:#b5a892;cursor:not-allowed}
+.dia.bloq{background:var(--noite);color:var(--areia);border-color:var(--noite)}
+.barra{position:sticky;bottom:0;background:rgba(243,236,223,.94);backdrop-filter:blur(8px);border-top:1px solid var(--linha);padding:12px 0;margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.barra .n{font-size:14px;color:var(--ink2);margin-right:auto}
+.campo{display:flex;gap:8px;align-items:center;font-size:14px}.campo input{width:220px}
+.dica{font-size:13px;color:var(--ink2);margin:0 0 6px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="tela-login" class="login">
+    <img src="logo.svg" alt="" width="72" height="72" style="margin:0 auto">
+    <h1>Chalé Veraneio<small>painel de datas</small></h1>
+    <input id="senha" type="password" placeholder="senha" autocomplete="current-password">
+    <button class="btn l" id="entrar">Entrar</button>
+    <div id="erro-login" class="aviso mal" hidden></div>
+  </section>
+
+  <main id="tela-painel" hidden>
+    <div class="topo">
+      <h1>Datas do chalé<small>clique num dia pra marcar como reservado/indisponível · clique de novo pra liberar</small></h1>
+      <div style="display:flex;gap:8px"><button class="btn o" id="recarregar">Recarregar</button><button class="btn o" id="sair">Sair</button></div>
+    </div>
+    <div class="legenda"><span><i></i>livre</span><span><i class="b"></i>reservado / indisponível</span><span><i class="p"></i>passado</span></div>
+    <div class="campo" style="margin-bottom:14px"><label for="preco">Valor exibido no site (opcional):</label><input id="preco" placeholder="ex.: a partir de R$ 590/noite"></div>
+    <div id="meses" class="meses"></div>
+    <div class="barra">
+      <span class="n" id="resumo">—</span>
+      <span id="status" class="aviso" hidden></span>
+      <button class="btn l" id="salvar">Salvar alterações</button>
+    </div>
+  </main>
+</div>
+<script>
+(function(){
+  "use strict";
+  var $=function(s){return document.querySelector(s)};
+  var SKEY="cv_senha", senha="", bloq={}, base={}, precoBase="";
+  try{senha=sessionStorage.getItem(SKEY)||""}catch(e){}
+  var hoje=new Date(); hoje.setHours(0,0,0,0);
+  var MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+  function status(msg,cls){var s=$("#status");s.textContent=msg;s.className="aviso "+(cls||"");s.hidden=!msg}
+  async function api(method,body){
+    var r=await fetch("/api/datas",{method:method,headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+    return r.json();
+  }
+  function desenhar(){
+    var html="", ini=new Date(hoje.getFullYear(),hoje.getMonth(),1);
+    for(var m=0;m<14;m++){
+      var d=new Date(ini.getFullYear(),ini.getMonth()+m,1), y=d.getFullYear(), mo=d.getMonth();
+      var dias=new Date(y,mo+1,0).getDate(), off=d.getDay();
+      html+='<div class="mes"><h3>'+MESES[mo]+" "+y+'</h3><div class="grade">'+["d","s","t","q","q","s","s"].map(function(x){return "<b>"+x+"</b>"}).join("");
+      for(var i=0;i<off;i++)html+='<span class="dia vazio"></span>';
+      for(var dd=1;dd<=dias;dd++){var dt=new Date(y,mo,dd),k=iso(dt),pass=dt<hoje;html+='<span class="dia'+(pass?" passado":"")+(bloq[k]?" bloq":"")+'" data-d="'+k+'"'+(pass?"":' role="button" tabindex="0"')+'>'+dd+"</span>"}
+      html+="</div></div>";
+    }
+    $("#meses").innerHTML=html; resumo();
+  }
+  function resumo(){
+    var n=Object.keys(bloq).length, mud=JSON.stringify(Object.keys(bloq).sort())!==JSON.stringify(Object.keys(base).sort())||$("#preco").value!==precoBase;
+    $("#resumo").textContent=n+" dia(s) bloqueado(s)"+(mud?" · alterações não salvas":"");
+    $("#salvar").disabled=!mud;
+  }
+  $("#meses").addEventListener("click",function(e){var el=e.target.closest(".dia[data-d]");if(!el||el.classList.contains("passado"))return;var k=el.dataset.d;if(bloq[k])delete bloq[k];else bloq[k]=1;el.classList.toggle("bloq",!!bloq[k]);resumo()});
+  $("#preco").addEventListener("input",resumo);
+  async function carregar(){
+    status("Carregando…");
+    var d=await api("GET");
+    if(!d||!d.ok){status("Não consegui ler as datas: "+(d&&d.erro||"?"),"mal");return}
+    bloq={};base={};(d.bloqueadas||[]).forEach(function(k){bloq[k]=1;base[k]=1});
+    precoBase=d.preco||"";$("#preco").value=precoBase;
+    desenhar();status(d.aviso||"", d.aviso?"mal":"");
+  }
+  async function salvar(){
+    var b=$("#salvar");b.disabled=true;status("Salvando…");
+    var d=await api("POST",{senha:senha,bloqueadas:Object.keys(bloq),preco:$("#preco").value.trim()});
+    if(d&&d.ok){base={};d.bloqueadas.forEach(function(k){base[k]=1});precoBase=d.preco||"";status("Salvo ✓ o site já mostra as datas novas","ok");resumo()}
+    else if(d&&d.erro==="senha_incorreta"){sair();$("#erro-login").textContent="Senha incorreta.";$("#erro-login").hidden=false}
+    else{status("Não salvou: "+(d&&(d.detalhe||d.erro)||"erro"),"mal");b.disabled=false}
+  }
+  function abrir(){$("#tela-login").hidden=true;$("#tela-painel").hidden=false;carregar()}
+  function sair(){senha="";try{sessionStorage.removeItem(SKEY)}catch(e){}$("#tela-painel").hidden=true;$("#tela-login").hidden=false}
+  // 🔐 login simples: guarda a senha na sessão e valida no servidor a cada gravação (não existe tabela de usuários).
+  $("#entrar").addEventListener("click",function(){var s=$("#senha").value.trim();if(!s)return;senha=s;try{sessionStorage.setItem(SKEY,s)}catch(e){}$("#senha").value="";abrir()});
+  $("#senha").addEventListener("keydown",function(e){if(e.key==="Enter")$("#entrar").click()});
+  $("#sair").addEventListener("click",sair);
+  $("#recarregar").addEventListener("click",carregar);
+  $("#salvar").addEventListener("click",salvar);
+  if(senha)abrir();
+})();
+</script>
+</body>
+</html>
